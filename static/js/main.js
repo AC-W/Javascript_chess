@@ -2,7 +2,7 @@
 game = new chess();
 var socket = null
 $(document).ready(function(){
-    socket = io.connect('http://127.0.0.1:5000');
+    socket = io.connect('https://ac-w.github.io/Javascript_chess/templates/index');
     socket.on('connect', function(){
         socket.send('User has connected');
     });
