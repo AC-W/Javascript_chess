@@ -1,1 +1,1 @@
-web: gunicorn -k eventlet app:app
+gunicorn -k gevent -w 1 module:app
