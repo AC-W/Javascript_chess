@@ -1,1 +1,1 @@
-web: gunicorn --worker-class eventlet -w 3 app:app
+web: waitress-serve server:app
