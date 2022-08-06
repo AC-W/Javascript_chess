@@ -1,0 +1,42 @@
+board_encodings:
+0 = empty
+positive (Black) negative (white):
+    1 : pawn
+    2 : rook
+    3 : knight
+    4 : bishop
+    5 : queen
+    6 : king
+
+score:
+    pawn : 1 points
+    knight/bishop : 3 points 
+    rook : 5 points
+    queen : 9 points
+
+special moves:
+Castling
+En passant
+Promotion:
+    ex:
+        e7d8r
+
+game states:
+win
+    conditions: 
+        -Checkmate
+        -Resignation
+loss
+    conditions: 
+        
+
+draw
+    conditions:
+        -stalemate
+        -Dead postion
+        -Draw agreement
+        -threefold repetition
+        -Fifity-move rule
+
+additional modes:
+    -Timed
