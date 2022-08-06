@@ -1,1 +1,1 @@
-web: waitress-serve --listen "*:$PORT" server:app
+web: waitress-serve --port=$PORT --threads=$WEB_CONCURRENCY server:app
