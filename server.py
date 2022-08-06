@@ -2,10 +2,12 @@ import chess
 from flask import Flask, render_template
 from flask_socketio import SocketIO, send
 import waitress
+import eventlet
+eventlet.monkey_patch()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
-socketio = SocketIO(app)
+socketio = SocketIO(app,async_mode='eventlet')
 
 def fen_to_array(fen):
     board = fen.split(' ')[0]

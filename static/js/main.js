@@ -2,7 +2,7 @@
 game = new chess();
 var socket = null
 $(document).ready(function(){
-    socket = io.connect('https://chessappl.herokuapp.com/');
+    socket = io.connect('http://127.0.0.1:5000/');
     socket.on('connect', function(){
         socket.send('User has connected');
     });
