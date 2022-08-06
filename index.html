@@ -6,60 +6,80 @@
 		<meta name="author" content="Ryan Wei">
 		<meta name="keywords" content="chess, Projects, Ryan">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" type="text/css" href="static/css/style.css">
-		<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"></script>
+		<link rel="stylesheet" type="text/css" href="./static/css/style.css">
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 		<script type="text/javascript"></script>
 		<title>Chess</title>
 	</head>
-	<body>
+	<script>
+		function reload(){
+			console.log('reset')
+			let xhr = new XMLHttpRequest();
+			xhr.open('GET','https://pyhtonchessapi.herokuapp.com/message',true)
+			xhr.onload = function () {
+				var data = JSON.parse(this.response)
+				if (xhr.status >= 200 && xhr.status < 400) {
+					if (data.valid == 1){
+						game.update(data.array)
+					}
+					picked_up = [null,null]
+					game.draw(gp_ctx)
+					game.draw(gpu_ctx,false)
+				} else {
+				console.log('error')
+				}
+			}
+			xhr.send()
+		}
+	</script>
+	<body onload="reload()">
 		<div style="display:none;">
 			<img id="black_pawn"
-				 src="static/resources/pieces_image/black_pawn.png"
+				 src="./static/resources/pieces_image/black_pawn.png"
 				 width="100" height="100">
 
 			<img id="white_pawn"
-				src="static/resources/pieces_image/white_pawn.png"
+				src="./static/resources/pieces_image/white_pawn.png"
 				width="100" height="100">
 
 			<img id="white_rook"
-				src="static/resources/pieces_image/white_rook.png"
+				src="./static/resources/pieces_image/white_rook.png"
 				width="100" height="100">
 
 			<img id="black_rook"
-				src="static/resources/pieces_image/black_rook.png"
+				src="./static/resources/pieces_image/black_rook.png"
 				width="100" height="100">
 
 			<img id="white_knight"
-				src="static/resources/pieces_image/white_knight.png"
+				src="./static/resources/pieces_image/white_knight.png"
 				width="100" height="100">
 
 			<img id="black_knight"
-				src="static/resources/pieces_image/black_knight.png"
+				src="./static/resources/pieces_image/black_knight.png"
 				width="100" height="100">
 
 			<img id="white_bishop"
-				src="static/resources/pieces_image/white_bishop.png"
+				src="./static/resources/pieces_image/white_bishop.png"
 				width="100" height="100">
 
 			<img id="black_bishop"
-				src="static/resources/pieces_image/black_bishop.png"
+				src="./static/resources/pieces_image/black_bishop.png"
 				width="100" height="100">
 
 			<img id="white_queen"
-				src="static/resources/pieces_image/white_queen.png"
+				src="./static/resources/pieces_image/white_queen.png"
 				width="100" height="100">
 
 			<img id="black_queen"
-				src="static/resources/pieces_image/black_queen.png"
+				src="./static/resources/pieces_image/black_queen.png"
 				width="100" height="100">
 
 			<img id="white_king"
-				src="static/resources/pieces_image/white_king.png"
+				src="./static/resources/pieces_image/white_king.png"
 				width="100" height="100">
 
 			<img id="black_king"
-				src="static/resources/pieces_image/black_king.png"
+				src="./static/resources/pieces_image/black_king.png"
 				width="100" height="100">
 		  </div>
 
@@ -74,8 +94,8 @@
 		</div>
 		<button id="restart">restart</button>
 
-		<script src="static/js/chess.js"></script>
-		<script src="static/js/main.js"></script>
+		<script src="./static/js/chess.js"></script>
+		<script src="./static/js/main.js"></script>
 	</body>
 
 </html>

@@ -1,37 +1,5 @@
 // Create Game state
 game = new chess();
-var socket = null
-$(document).ready(function(){
-    socket = io.connect('http://127.0.0.1:5000/');
-    socket.on('connect', function(){
-        socket.send('User has connected');
-    });
-    socket.on('validmove', function(data) {
-        if (data.valid == 1){
-            game.update(data.array)
-        }
-        picked_up = [null,null]
-        game.draw(gp_ctx)
-        game.draw(gpu_ctx,false)
-    });
-
-    $('#restart').on('click',function(){
-        socket.send('restarting...');
-    });
-
-    socket.on('validmove_piece',function(data){
-        if (data.validmove.length != 0){
-            console.log(data.validmove)
-            for(var i = 0; i < data.validmove.length;i++){
-                move = game.uci_to_move(data.validmove[i])
-                console.log(move)
-                game.board[move[1][0]][move[1][1]].highlight = true
-            }
-        }
-        game.draw(gpu_ctx,false)
-        game.clear()
-    });
-});
 
 // Create Game board
 const game_board = document.getElementById('game_board');
@@ -78,6 +46,7 @@ for (var x = 0; x <= 8;x++){
     }
 }
 
+
 game.draw(gp_ctx)
 
 // Compute where player click on screen
@@ -111,9 +80,33 @@ document.addEventListener('mousedown', (event) => {
     }
     picked_up = [last_highlighted[0],last_highlighted[1]]
     selected = [last_highlighted[0],last_highlighted[1]]
-    let uci = game.dic[selected[0]]
+    var uci = game.dic[selected[0]]
     uci = uci.concat(8-selected[1])
-    socket.emit('check_move_piece',uci)
+    let xhr = new XMLHttpRequest();
+    formData = new FormData();
+    formData.append('uci',uci);
+    xhr.open('POST','https://pyhtonchessapi.herokuapp.com/check_move_piece',true);
+    
+    xhr.onload = function () {
+        var data = JSON.parse(this.response)
+        if (xhr.status >= 200 && xhr.status < 400) {
+            if (data.validmove.length != 0){
+                console.log(data.validmove)
+                for(var i = 0; i < data.validmove.length;i++){
+                    move = game.uci_to_move(data.validmove[i])
+                    console.log(move)
+                    game.board[move[1][0]][move[1][1]].highlight = true
+                }
+            }
+            game.draw(gpu_ctx,false)
+            game.clear()
+            console.log(data)
+        } else {
+          console.log('error')
+        }
+    }
+    console.log(uci)
+    xhr.send(formData);
 });
 
 document.addEventListener('mouseup', (event) => {
@@ -121,9 +114,49 @@ document.addEventListener('mouseup', (event) => {
         picked_up = [null,null]
         return
     }
-    uci = game.move_to_uci(picked_up,last_highlighted)
-    socket.emit('check_move',uci)    
+    var uci = game.move_to_uci(picked_up,last_highlighted)
+    formData = new FormData();
+    formData.append('uci',uci);
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST','https://pyhtonchessapi.herokuapp.com/check_move',true);
+
+    xhr.onload = function () {
+        var data = JSON.parse(this.response)
+        if (xhr.status >= 200 && xhr.status < 400) {
+            if (data.valid == 1){
+                game.update(data.array)
+            }
+            picked_up = [null,null]
+            game.draw(gp_ctx)
+            game.draw(gpu_ctx,false)
+        } else {
+          console.log('error')
+        }
+    }
+    xhr.send(formData);
 });
+
+const reset = document.getElementById('restart');
+
+reset.addEventListener("click", ()=>{
+    console.log('reset')
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET','https://pyhtonchessapi.herokuapp.com/message',true)
+    xhr.onload = function () {
+        var data = JSON.parse(this.response)
+        if (xhr.status >= 200 && xhr.status < 400) {
+            if (data.valid == 1){
+                game.update(data.array)
+            }
+            picked_up = [null,null]
+            game.draw(gp_ctx)
+            game.draw(gpu_ctx,false)
+        } else {
+          console.log('error')
+        }
+    }
+    xhr.send()
+})
 
 function find_closest_block(x,y){
     b1 = Math.floor(x / block_size)
