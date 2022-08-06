@@ -11,27 +11,6 @@
 		<script type="text/javascript"></script>
 		<title>Chess</title>
 	</head>
-	<script>
-		function reload(){
-			console.log('reset')
-			let xhr = new XMLHttpRequest();
-			xhr.open('GET','https://pyhtonchessapi.herokuapp.com/message',true)
-			xhr.onload = function () {
-				var data = JSON.parse(this.response)
-				if (xhr.status >= 200 && xhr.status < 400) {
-					if (data.valid == 1){
-						game.update(data.array)
-					}
-					picked_up = [null,null]
-					game.draw(gp_ctx)
-					game.draw(gpu_ctx,false)
-				} else {
-				console.log('error')
-				}
-			}
-			xhr.send()
-		}
-	</script>
 	<body onload="reload()">
 		<div style="display:none;">
 			<img id="black_pawn"
@@ -86,16 +65,87 @@
 		<div class="header">
 			<h1>Chess</h1>
 		</div>
-		
-		<div class="canvas_container">
-			<canvas id="game_board"></canvas>
-			<canvas id="game_pieces"></canvas>
-			<canvas id="game_pieces_up"></canvas>
-		</div>
-		<button id="restart">restart</button>
 
+		<div class="main_container">
+
+			<div class="canvas_container">
+				<canvas id="game_board"></canvas>
+				<canvas id="game_pieces"></canvas>
+				<canvas id="game_pieces_up"></canvas>
+			</div>
+
+			<div class="input_container">
+				<button class="input_items" id="restart">Restart</button>
+				<input class="input_items" type="text" id="secret_key" placeholder="Join ID"></input>
+				<p>Type ID to Join</p>
+				<div style="display: flex; flex-direction:row;" class="input_items">
+					<button id="generate_key" onclick="generatekey()">Generate ID</button>
+					<button style="margin-left: 1rem;" id="join_game" onclick="join_game()">Join Game</button>
+				</div>
+			</div>
+
+		</div>
+		<script>
+			const requestURL = "https://pyhtonchessapi.herokuapp.com"
+		</script>
 		<script src="./static/js/chess.js"></script>
 		<script src="./static/js/main.js"></script>
+		<script>
+			const secret_key = document.getElementById('secret_key');
+
+			function reload(){
+				console.log('reset')
+				let xhr = new XMLHttpRequest();
+				formData = new FormData();
+    			formData.append('gameID',secret_key.value);
+
+				xhr.open('POST',requestURL+'/reset',true)
+				xhr.onload = function () {
+					var data = JSON.parse(this.response)
+					if (xhr.status >= 200 && xhr.status < 400) {
+						if (data.valid == 1){
+							game.update(data.array)
+						}
+						picked_up = [null,null]
+						game.draw(gp_ctx)
+						game.draw(gpu_ctx,false)
+					} else {
+					console.log('error')
+					}
+				}
+				xhr.send(formData)
+			}
+			function uid() {
+				return (performance.now().toString(36)+Math.random().toString(36)).replace(/\./g,"");
+			};
+			function generatekey(){
+				console.log("generating new ID")
+				secret_key.value = uid()
+			}
+
+			function join_game(){
+				formData = new FormData();
+    			formData.append('gameID',secret_key.value);
+
+				let xhr = new XMLHttpRequest();
+				xhr.open('POST',requestURL+'/start_game',true);
+				xhr.onload = function () {
+					var data = JSON.parse(this.response)
+					if (xhr.status >= 200 && xhr.status < 400) {
+						if (data.valid == 1){
+							game.update(data.array)
+						}
+						picked_up = [null,null]
+						game.draw(gp_ctx)
+						game.draw(gpu_ctx,false)
+					} else {
+					console.log('error')
+					}
+				}
+				xhr.send(formData);
+			}
+		</script>
+
 	</body>
 
 </html>

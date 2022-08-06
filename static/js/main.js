@@ -84,8 +84,9 @@ document.addEventListener('mousedown', (event) => {
     uci = uci.concat(8-selected[1])
     let xhr = new XMLHttpRequest();
     formData = new FormData();
-    formData.append('uci',uci);
-    xhr.open('POST','https://pyhtonchessapi.herokuapp.com/check_move_piece',true);
+    command = uci+'-'+secret_key.value
+    formData.append('command',command);
+    xhr.open('POST',requestURL+'/check_move_piece',true);
     
     xhr.onload = function () {
         var data = JSON.parse(this.response)
@@ -115,10 +116,11 @@ document.addEventListener('mouseup', (event) => {
         return
     }
     var uci = game.move_to_uci(picked_up,last_highlighted)
-    formData = new FormData();
-    formData.append('uci',uci);
+    command = uci+'-'+secret_key.value
+    formData.append('command',command);
+
     let xhr = new XMLHttpRequest();
-    xhr.open('POST','https://pyhtonchessapi.herokuapp.com/check_move',true);
+    xhr.open('POST',requestURL+'/check_move',true);
 
     xhr.onload = function () {
         var data = JSON.parse(this.response)
@@ -141,7 +143,9 @@ const reset = document.getElementById('restart');
 reset.addEventListener("click", ()=>{
     console.log('reset')
     let xhr = new XMLHttpRequest();
-    xhr.open('GET','https://pyhtonchessapi.herokuapp.com/message',true)
+    formData = new FormData();
+    formData.append('gameID',secret_key.value);
+    xhr.open('post',requestURL+'/reset',true)
     xhr.onload = function () {
         var data = JSON.parse(this.response)
         if (xhr.status >= 200 && xhr.status < 400) {
@@ -155,7 +159,7 @@ reset.addEventListener("click", ()=>{
           console.log('error')
         }
     }
-    xhr.send()
+    xhr.send(formData)
 })
 
 function find_closest_block(x,y){
@@ -166,6 +170,24 @@ function find_closest_block(x,y){
 
 function animate(){
     requestAnimationFrame(animate);
+    let xhr = new XMLHttpRequest();
+    formData = new FormData();
+    formData.append('gameID',secret_key.value);
+    xhr.open('post',requestURL+'/update_state',true)
+    xhr.onload = function () {
+        var data = JSON.parse(this.response)
+        if (xhr.status >= 200 && xhr.status < 400) {
+            if (data.valid == 1){
+                game.update(data.array)
+                game.draw(gp_ctx)
+                
+            }
+        } else {
+        console.log('error')
+        }
+    }
+    xhr.send(formData)
+    setTimeout(()=> console.log("updating state"),100)
 }
 
 animate();
