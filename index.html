@@ -87,6 +87,7 @@
 		</div>
 		<script>
 			const requestURL = "https://pyhtonchessapi.herokuapp.com"
+			var myId = "None"
 		</script>
 		<script src="./static/js/chess.js"></script>
 		<script src="./static/js/main.js"></script>
@@ -124,8 +125,9 @@
 			}
 
 			function join_game(){
+				myId = secret_key.value
 				formData = new FormData();
-    			formData.append('gameID',secret_key.value);
+    			formData.append('gameID',myId);
 
 				let xhr = new XMLHttpRequest();
 				xhr.open('POST',requestURL+'/start_game',true);

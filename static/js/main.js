@@ -84,7 +84,7 @@ document.addEventListener('mousedown', (event) => {
     uci = uci.concat(8-selected[1])
     let xhr = new XMLHttpRequest();
     formData = new FormData();
-    command = uci+'-'+secret_key.value
+    command = uci+'-'+myId
     formData.append('command',command);
     xhr.open('POST',requestURL+'/check_move_piece',true);
     
@@ -116,7 +116,7 @@ document.addEventListener('mouseup', (event) => {
         return
     }
     var uci = game.move_to_uci(picked_up,last_highlighted)
-    command = uci+'-'+secret_key.value
+    command = uci+'-'+myId
     formData.append('command',command);
 
     let xhr = new XMLHttpRequest();
@@ -144,7 +144,7 @@ reset.addEventListener("click", ()=>{
     console.log('reset')
     let xhr = new XMLHttpRequest();
     formData = new FormData();
-    formData.append('gameID',secret_key.value);
+    formData.append('gameID',myId);
     xhr.open('post',requestURL+'/reset',true)
     xhr.onload = function () {
         var data = JSON.parse(this.response)
@@ -172,7 +172,7 @@ function animate(){
     requestAnimationFrame(animate);
     let xhr = new XMLHttpRequest();
     formData = new FormData();
-    formData.append('gameID',secret_key.value);
+    formData.append('gameID',myId);
     xhr.open('post',requestURL+'/update_state',true)
     xhr.onload = function () {
         var data = JSON.parse(this.response)
