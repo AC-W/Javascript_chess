@@ -2,7 +2,7 @@
 game = new chess();
 var socket = null
 $(document).ready(function(){
-    socket = io.connect('https://ac-w.github.io/Javascript_chess/templates/index');
+    socket = io.connect('https://chessappl.herokuapp.com/');
     socket.on('connect', function(){
         socket.send('User has connected');
     });
