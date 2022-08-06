@@ -1,6 +1,7 @@
 import chess
 from flask import Flask, render_template
 from flask_socketio import SocketIO, send
+import waitress
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
