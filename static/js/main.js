@@ -170,24 +170,24 @@ function find_closest_block(x,y){
 
 function animate(){
     requestAnimationFrame(animate);
-    // let xhr = new XMLHttpRequest();
-    // formData = new FormData();
-    // formData.append('gameID',myId);
-    // xhr.open('post',requestURL+'/update_state',true)
-    // xhr.onload = function () {
-    //     var data = JSON.parse(this.response)
-    //     if (xhr.status >= 200 && xhr.status < 400) {
-    //         if (data.valid == 1){
-    //             game.update(data.array)
-    //             game.draw(gp_ctx)
+    let xhr = new XMLHttpRequest();
+    formData = new FormData();
+    formData.append('gameID',myId);
+    xhr.open('post',requestURL+'/update_state',true)
+    xhr.onload = function () {
+        var data = JSON.parse(this.response)
+        if (xhr.status >= 200 && xhr.status < 400) {
+            if (data.valid == 1){
+                game.update(data.array)
+                game.draw(gp_ctx)
                 
-    //         }
-    //     } else {
-    //     console.log('error')
-    //     }
-    // }
-    // xhr.send(formData)
-    // setTimeout(()=> console.log("updating state"),10000)
+            }
+        } else {
+        console.log('error')
+        }
+    }
+    xhr.send(formData)
+    setTimeout(()=> console.log("updating state"),100)
 }
 
 animate();
