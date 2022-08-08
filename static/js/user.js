@@ -1,7 +1,10 @@
 const secret_key = document.getElementById('secret_key');
 const user_ID = document.getElementById('user_ID');
 const username = document.getElementById('username');
-const username_in = document.getElementById('username_in')
+const username_in = document.getElementById('username_in');
+
+const message = document.getElementById('chat_entered');
+const global_message = document.getElementById('global_chat');
 
 function uid() {
     return (performance.now().toString(36)+Math.random().toString(36)).replace(/\./g,"");
@@ -102,6 +105,27 @@ function join_game(){
             game.draw(gpu_ctx,false)
         } else {
         console.log('error')
+        }
+    }
+    xhr.send(formData);
+}
+
+function send_message(){
+    message_input = message.value
+    console.log(message_input)
+    myId = secret_key.value
+    formData = new FormData();
+    formData.append('gameID',myId);
+    formData.append('userId',user_ID.innerHTML);
+    formData.append('message',message_input);
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST',requestURL+'/new_message',true);
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 400) {
+            console.log('message_sent')
+        } 
+        else {
+            console.log('error')
         }
     }
     xhr.send(formData);

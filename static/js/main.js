@@ -180,7 +180,9 @@ function animate(){
             if (data.valid == 1){
                 game.update(data.array)
                 game.draw(gp_ctx)
-                
+                if (data.chat != undefined){
+                    global_message.value = data.chat;
+                } 
             }
         } else {
         console.log('error')

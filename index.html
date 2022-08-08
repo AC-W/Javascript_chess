@@ -76,14 +76,6 @@
 
 		<div class="main_container">
 
-			<div class="canvas_container">
-				<canvas id="game_board"></canvas>
-				<canvas id="game_pieces"></canvas>
-				<canvas id="game_pieces_up"></canvas>
-			</div>
-
-			
-
 			<div class="input_container">
 				<button class="input_items" id="restart">Restart</button>
 				<input class="input_items" type="text" id="secret_key" placeholder="Join ID"></input>
@@ -94,10 +86,27 @@
 				</div>
 			</div>
 
+			<div class="canvas_container">
+				<canvas id="game_board"></canvas>
+				<canvas id="game_pieces"></canvas>
+				<canvas id="game_pieces_up"></canvas>
+			</div>
+
+			<div class="chat_container">
+				<!-- &#10 for new line -->
+				<textarea disabled id="global_chat"> Empty Chat. Sadge :(</textarea>
+				<div class="text_input_area">
+					<textarea style="width:80%;" id="chat_entered"></textarea>
+					<button style="width: 20%;" onclick="send_message()">Send</button>
+				</div>
+			</div>
+
+			
+
 		</div>
 		<script>
-			const requestURL = "https://pyhtonchessapi.herokuapp.com"
-			// const requestURL = "http://127.0.0.1:8000"
+			// const requestURL = "https://pyhtonchessapi.herokuapp.com"
+			const requestURL = "http://127.0.0.1:8000"
 			var myId = "None"
 		</script>
 		<script src="./static/js/chess.js"></script>
