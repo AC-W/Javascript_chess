@@ -84,8 +84,8 @@ document.addEventListener('mousedown', (event) => {
     uci = uci.concat(8-selected[1])
     let xhr = new XMLHttpRequest();
     formData = new FormData();
-    command = uci+'-'+myId
-    formData.append('command',command);
+    formData.append('uci',uci);
+    formData.append('gameID',myId)
     xhr.open('POST',requestURL+'/check_move_piece',true);
     
     xhr.onload = function () {
@@ -116,8 +116,8 @@ document.addEventListener('mouseup', (event) => {
         return
     }
     var uci = game.move_to_uci(picked_up,last_highlighted)
-    command = uci+'-'+myId
-    formData.append('command',command);
+    formData.append('uci',uci);
+    formData.append('gameID',myId)
 
     let xhr = new XMLHttpRequest();
     xhr.open('POST',requestURL+'/check_move',true);
@@ -169,27 +169,33 @@ function find_closest_block(x,y){
 }
 
 function animate(){
-    requestAnimationFrame(animate);
-    let xhr = new XMLHttpRequest();
-    formData = new FormData();
+    var xhr = new XMLHttpRequest();
+    var formData = new FormData();
     formData.append('gameID',myId);
-    xhr.open('post',requestURL+'/update_state',true)
-    xhr.onload = function () {
-        var data = JSON.parse(this.response)
-        if (xhr.status >= 200 && xhr.status < 400) {
-            if (data.valid == 1){
-                game.update(data.array)
-                game.draw(gp_ctx)
-                if (data.chat != undefined){
-                    global_message.value = data.chat;
-                } 
-            }
-        } else {
-        console.log('error')
+    formData.append('userId',user_ID.innerHTML);
+    xhr.onreadystatechange = (e) => {
+      if (xhr.readyState !== 4) {
+        
+        return;
+      }
+    
+      if (xhr.status === 200) {
+        var data = JSON.parse(xhr.response)
+        if (data.valid == 1){
+          game.update(data.array)
+          if (data.chat != undefined){
+            global_message.value = data.chat;
+          }
         }
+        game.draw(gp_ctx)
+        setTimeout(animate,200)
+      } 
+      else {
+        console.log('error')
+      }
     }
+    xhr.open('post',requestURL+'/update_state',true)
     xhr.send(formData)
-    setTimeout(()=> console.log("updating state"),100)
-}
+  };
 
-animate();
+animate()
