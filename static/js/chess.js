@@ -118,6 +118,7 @@ class chess{
         for (var a = 0; a < 8;a++){
             for(var b = 0;b < 8; b++){
                 this.board[a][b].highlight = false
+                this.board[a][b].canPromote = false
             }
         }
     }
@@ -224,6 +225,7 @@ class piece {
         this.y = 0
         this.highlight = false
         this.sym = '.'
+        this.canPromote = false
     }
 
     draw(ctx,pieces=true){

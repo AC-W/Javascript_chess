@@ -57,6 +57,15 @@
     width: 100%;
 }
 
+.account_info_container{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
 .user_info_item{
     margin: 1rem;
 }
@@ -82,4 +91,51 @@
 #game_pieces_up{
     position: absolute;
     z-index: 3;
+}
+
+/* Popup container */
+.popup {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+
+.popup_button{
+    display: flex;
+    width: 10rem;
+    height: 2rem;
+    justify-items: center;
+    align-items: center;
+    border: solid;
+}
+  
+/* The actual popup (appears on top) */
+.popup .popuptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 4;
+}
+
+/* Toggle this class when clicking on the popup container (hide and show the popup) */
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
 }

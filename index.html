@@ -8,10 +8,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" type="text/css" href="./static/css/style.css">
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
 		<script type="text/javascript"></script>
 		<title>Chess</title>
 	</head>
-	<body onload="reload()" onunload="close()">
+	<body onload="reload()">
 		<div style="display:none;">
 			<img id="black_pawn"
 				 src="./static/resources/pieces_image/black_pawn.png"
@@ -66,23 +67,60 @@
 			<h1>Chess</h1>
 		</div>
 
-		<div class="user_info_container">
-			<input class="user_info_item" type="text" id="username_in" placeholder="Your Name"></input>
-			<button class="user_info_item" id="create_account" onclick="create_account()">Create account</button>
-			<p class="user_info_item" id ="username"></p>
-			<p class="user_info_item">(DEBUG) Your ID:</p>
-			<p class="user_info_item" id ="user_ID"></p>
+		<div class="account_info_container">
+			<div class="popup" id="login">
+				<div class="popup_button" onclick="popup('login_account_popup')">
+					<p style="margin-left: 3.5rem;" >Login</p>
+				</div>
+				<div class="popuptext" id="login_account_popup">
+					<input class="user_info_item" type="text" id="user_id_in" placeholder="Your User ID"></input>
+					<input class="user_info_item" type="text" id="password_in" placeholder="Password"></input>
+					<button onclick="login()" onclick="popup('login_account_popup')">Login</button>
+				</div>
+			</div>
+			<div class="popup" id="create_account" style="margin-left: 5rem;">
+				<div class="popup_button" onclick="popup('create_account_popup')">
+					<p style="margin-left: 2rem;">Create account</p>
+				</div>
+				<div class="popuptext" id="create_account_popup">
+					<input class="user_info_item" type="text" id="user_id_in" placeholder="Your User ID"></input>
+					<input class="user_info_item" type="text" id="username_in" placeholder="Your Name"></input>
+					<input class="user_info_item" type="text" id="password_in" placeholder="Password"></input>
+					<button onclick="create_account()">Create Account</button>
+				</div>
+			</div>
 		</div>
 
+		<div class="user_info_container">
+			<p>Username:</p>
+			<p class="user_info_item" id ="username">Guest</p>
+		</div>
+		<div class="popup">
+			<div class="popuptext" id="piece_selection_popup">
+				<button onclick="setPromotion('q')">Queen</button>
+				<button onclick="setPromotion('r')">Rook</button>
+				<button onclick="setPromotion('b')">Bishop</button>
+				<button onclick="setPromotion('k')">Knight</button>
+			</div>
+		</div>
 		<div class="main_container">
 
 			<div class="input_container">
 				<button class="input_items" id="restart">Restart</button>
-				<input class="input_items" type="text" id="secret_key" placeholder="Join ID"></input>
+				<input class="input_items" type="text" id="game_ID_input" placeholder="Join ID"></input>
 				<p>Type ID to Join</p>
+				<p>Current game ID:</p>
+				<p id = 'game_ID'></p>
 				<div style="display: flex; flex-direction:row;" class="input_items">
 					<button id="generate_key" onclick="generatekey()">Generate ID</button>
-					<button style="margin-left: 1rem;" id="join_game" onclick="join_game()">Join Game</button>
+					<button style="margin-left: 1rem;" id="join_game" onclick="popup('player_selection_popup')">Join Game</button>
+					<div class="popup">
+						<div class="popuptext" id="player_selection_popup">
+							<button onclick="join_game('white')">White</button>
+							<button onclick="join_game('black')">Black</button>
+							<button onclick="join_game('spectate')">Spectator</button>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -101,13 +139,18 @@
 				</div>
 			</div>
 
-			
-
 		</div>
 		<script>
-			const requestURL = "https://pythonchessapi.herokuapp.com"
-			// const requestURL = "http://127.0.0.1:8000"
+			// create socket connection
+			const socket = io("https://socketioserveracw.herokuapp.com");
 			var myId = "None"
+			function popup(item) {
+				var popup = document.getElementById(item);
+				popup.classList.toggle("show");
+			}
+			var play_as = 'spectate'
+			var promotion_show = false
+			var promotion_selection = null
 		</script>
 		<script src="./static/js/chess.js"></script>
 		<script src="./static/js/main.js"></script>

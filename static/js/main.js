@@ -46,6 +46,77 @@ for (var x = 0; x <= 8;x++){
     }
 }
 
+socket.on('update_move_check', (data) =>{
+    if (data.validmove.length != 0){
+    game.clear()
+    let canPromote = false
+        for(var i = 0; i < data.validmove.length;i++){
+            var move = game.uci_to_move(data.validmove[i])
+            if (!canPromote){
+                try{
+                    if (data.validmove[i][4] == 'q'){
+                        game.board[move[0][0]][move[0][1]].canPromote = true
+                        canPromote = true
+                        console.log(game.board[move[0][0]][move[0][1]])
+                    }
+                    else if (data.validmove[i][4] == 'r'){
+                        game.board[move[0][0]][move[0][1]].canPromote = true
+                        canPromote = true
+                    }
+                    else if (data.validmove[i][4] == 'b'){
+                        game.board[move[0][0]][move[0][1]].canPromote = true
+                        canPromote = true
+                    }
+                    else if (data.validmove[i][4] == 'n'){
+                        game.board[move[0][0]][move[0][1]].canPromote = true
+                        canPromote = true
+                    }
+                }
+                catch(err){
+                    console.log('no Promotion')
+                }
+            }
+            game.board[move[1][0]][move[1][1]].highlight = true
+        }
+        if (canPromote && !promotion_selection){
+            if (!promotion_show){
+                var popup = document.getElementById("piece_selection_popup");
+                popup.classList.toggle("show");
+                promotion_show = true
+            }
+        }
+        else if (!promotion_selection){
+            if(promotion_show){
+                var popup = document.getElementById("piece_selection_popup");
+                popup.classList.toggle("show");
+                promotion_show = false
+            }
+        }
+        game.draw(gpu_ctx,false)
+        
+    }
+})
+
+function setPromotion(key){
+    promotion_selection = key
+    var popup = document.getElementById("piece_selection_popup");
+    popup.classList.toggle("show");
+    promotion_show = false
+}
+
+socket.on('update_board', (data) => {
+    game.update(data.game_array)
+    game.draw(gp_ctx)
+})
+
+socket.on('update_chat', (data) => {
+    global_message.value = data.chat;
+})
+
+socket.on('update_state', (data) => {
+    global_message.value = data.chat;
+    game.update(data.game_array)
+})
 
 game.draw(gp_ctx)
 
@@ -74,40 +145,19 @@ document.addEventListener('mousemove', (event) => {
     }
 });
 
-document.addEventListener('mousedown', (event) => {
+document.addEventListener('mousedown', (event) => { 
     if (last_highlighted[0] == null || last_highlighted[1] == null || game.board[last_highlighted[0]][last_highlighted[1]].name === "blank"){
+        return
+    }
+    if (play_as == 'spectate' || game.board[last_highlighted[0]][last_highlighted[1]].color != play_as ){
         return
     }
     picked_up = [last_highlighted[0],last_highlighted[1]]
     selected = [last_highlighted[0],last_highlighted[1]]
     var uci = game.dic[selected[0]]
     uci = uci.concat(8-selected[1])
-    let xhr = new XMLHttpRequest();
-    formData = new FormData();
-    formData.append('uci',uci);
-    formData.append('gameID',myId)
-    xhr.open('POST',requestURL+'/check_move_piece',true);
+    socket.emit('check_move_piece',{game_ID:game_ID.innerHTML,uci:uci})
     
-    xhr.onload = function () {
-        var data = JSON.parse(this.response)
-        if (xhr.status >= 200 && xhr.status < 400) {
-            if (data.validmove.length != 0){
-                console.log(data.validmove)
-                for(var i = 0; i < data.validmove.length;i++){
-                    move = game.uci_to_move(data.validmove[i])
-                    console.log(move)
-                    game.board[move[1][0]][move[1][1]].highlight = true
-                }
-            }
-            game.draw(gpu_ctx,false)
-            game.clear()
-            console.log(data)
-        } else {
-          console.log('error')
-        }
-    }
-    console.log(uci)
-    xhr.send(formData);
 });
 
 document.addEventListener('mouseup', (event) => {
@@ -116,50 +166,37 @@ document.addEventListener('mouseup', (event) => {
         return
     }
     var uci = game.move_to_uci(picked_up,last_highlighted)
-    formData.append('uci',uci);
-    formData.append('gameID',myId)
-
-    let xhr = new XMLHttpRequest();
-    xhr.open('POST',requestURL+'/check_move',true);
-
-    xhr.onload = function () {
-        var data = JSON.parse(this.response)
-        if (xhr.status >= 200 && xhr.status < 400) {
-            if (data.valid == 1){
-                game.update(data.array)
-            }
-            picked_up = [null,null]
-            game.draw(gp_ctx)
-            game.draw(gpu_ctx,false)
-        } else {
-          console.log('error')
-        }
+    if (game.board[picked_up[0]][picked_up[1]].canPromote){
+        uci = uci + promotion_selection
+        promotion_selection = null
     }
-    xhr.send(formData);
+    console.log(uci)
+    socket.emit('check_move',{game_ID:game_ID.innerHTML,uci:uci})
+    game.draw(gpu_ctx,false)
 });
 
 const reset = document.getElementById('restart');
 
 reset.addEventListener("click", ()=>{
     console.log('reset')
-    let xhr = new XMLHttpRequest();
-    formData = new FormData();
-    formData.append('gameID',myId);
-    xhr.open('post',requestURL+'/reset',true)
-    xhr.onload = function () {
-        var data = JSON.parse(this.response)
-        if (xhr.status >= 200 && xhr.status < 400) {
-            if (data.valid == 1){
-                game.update(data.array)
-            }
-            picked_up = [null,null]
-            game.draw(gp_ctx)
-            game.draw(gpu_ctx,false)
-        } else {
-          console.log('error')
-        }
-    }
-    xhr.send(formData)
+    // let xhr = new XMLHttpRequest();
+    // formData = new FormData();
+    // formData.append('gameID',game_ID.innerHTML);
+    // xhr.open('post',requestURL+'/reset',true)
+    // xhr.onload = function () {
+    //     var data = JSON.parse(this.response)
+    //     if (xhr.status >= 200 && xhr.status < 400) {
+    //         if (data.valid == 1){
+    //             game.update(data.array)
+    //         }
+    //         picked_up = [null,null]
+    //         game.draw(gp_ctx)
+    //         game.draw(gpu_ctx,false)
+    //     } else {
+    //       console.log('error')
+    //     }
+    // }
+    // xhr.send(formData)
 })
 
 function find_closest_block(x,y){
@@ -167,35 +204,3 @@ function find_closest_block(x,y){
     b2 = Math.floor(y / block_size)
     return [b1,b2]
 }
-
-function animate(){
-    var xhr = new XMLHttpRequest();
-    var formData = new FormData();
-    formData.append('gameID',myId);
-    formData.append('userId',user_ID.innerHTML);
-    xhr.onreadystatechange = (e) => {
-      if (xhr.readyState !== 4) {
-        
-        return;
-      }
-    
-      if (xhr.status === 200) {
-        var data = JSON.parse(xhr.response)
-        if (data.valid == 1){
-          game.update(data.array)
-          if (data.chat != undefined){
-            global_message.value = data.chat;
-          }
-        }
-        game.draw(gp_ctx)
-        setTimeout(animate,200)
-      } 
-      else {
-        console.log('error')
-      }
-    }
-    xhr.open('post',requestURL+'/update_state',true)
-    xhr.send(formData)
-  };
-
-animate()
