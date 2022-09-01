@@ -9,6 +9,8 @@ const global_message = document.getElementById('global_chat');
 const game_ID_input = document.getElementById('game_ID_input')
 const game_ID = document.getElementById('game_ID')
 
+var play_as = null;
+
 function uid() {
     return (performance.now().toString(36)+Math.random().toString(36)).replace(/\./g,"");
 };
@@ -79,4 +81,9 @@ function join_game(play_as){
 
 function send_message(){
     socket.emit('new_message',{game_ID:game_ID.innerHTML,message:message.value})
+}
+
+function ai_join(){
+    game_ID.innerHTML = game_ID_input.value
+    socket.emit('add_stockfish_ai',{game_ID:game_ID.innerHTML,join_as:play_as})
 }

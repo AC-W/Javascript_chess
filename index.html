@@ -114,6 +114,7 @@
 				<div style="display: flex; flex-direction:row;" class="input_items">
 					<button id="generate_key" onclick="generatekey()">Generate ID</button>
 					<button style="margin-left: 1rem;" id="join_game" onclick="popup('player_selection_popup')">Join Game</button>
+					<button style="margin-left: 1rem;" id="ai_join" onclick="ai_join()">AI Join</button>
 					<div class="popup">
 						<div class="popuptext" id="player_selection_popup">
 							<button onclick="join_game('white')">White</button>
@@ -142,6 +143,7 @@
 		</div>
 		<script>
 			// create socket connection
+			// const socket = io("http://127.0.0.1:17995")
 			const socket = io("https://socketioserveracw.herokuapp.com");
 			var myId = "None"
 			function popup(item) {
