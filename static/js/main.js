@@ -106,6 +106,8 @@ function setPromotion(key){
 
 socket.on('update_board', (data) => {
     game.update(data.game_array)
+    game.clear()
+    game.draw(gpu_ctx,false)
     game.draw(gp_ctx)
 })
 
