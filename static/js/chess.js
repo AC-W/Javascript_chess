@@ -31,7 +31,6 @@ class chess{
         }
         this.board = x;
         this.reset_board();
-        
 
         this.back_wins = false
         this.white_wins = false

@@ -11,6 +11,7 @@ const game_ID = document.getElementById('game_ID')
 
 var play_as = null;
 
+// unique id generation
 function uid() {
     return (performance.now().toString(36)+Math.random().toString(36)).replace(/\./g,"");
 };
@@ -30,6 +31,10 @@ socket.on('account_creation_success',(data)=>{
     popup.classList.toggle("show");
 })
 
+function login(){
+    socket.emit('login',{user_ID:user_ID_in.value,password:password_in.value})
+}
+
 socket.on('logged in', (data) =>{
     username.innerHTML = data.username
     var popup = document.getElementById("login_account_popup");
@@ -39,49 +44,29 @@ socket.on('logged in', (data) =>{
     console.log(username)
 })
 
-function login(){
-    socket.emit('login',{user_ID:user_ID_in.value,password:password_in.value})
+function join_game(play_as){
+    game_ID.innerHTML = game_ID_input.value
+    socket.emit('join_game',{game_ID:game_ID.innerHTML,join_as:play_as})
 }
 
-function reload(){
-    console.log('reset')
-    // let xhr = new XMLHttpRequest();
-    // formData = new FormData();
-    // formData.append('gameID',secret_key.value);
-    
-    // xhr.open('POST',requestURL+'/reset',true)
-    // xhr.onload = function () {
-    //     var data = JSON.parse(this.response)
-    //     if (xhr.status >= 200 && xhr.status < 400) {
-    //         if (data.valid == 1){
-    //             game.update(data.array)
-    //         }
-    //         picked_up = [null,null]
-    //         game.draw(gp_ctx)
-    //         game.draw(gpu_ctx,false)
-    //     } else {
-    //     console.log('error')
-    //     }
-    // }
-    // xhr.send(formData)
-}
 
 socket.on('joined as', (data) => {
     var popup = document.getElementById("player_selection_popup");
     popup.classList.toggle("show");
     play_as = data.join_as
+
+    //TODO implement board rotation when playing as black
     console.log(data.join_as)
 })
-
-function join_game(play_as){
-    game_ID.innerHTML = game_ID_input.value
-
-    socket.emit('join_game',{game_ID:game_ID.innerHTML,join_as:play_as})
-}
 
 function send_message(){
     socket.emit('new_message',{game_ID:game_ID.innerHTML,message:message.value})
 }
+
+// server returns the entire chat room history upon recieve new messages
+socket.on('update_chat', (data) => {
+    global_message.value = data.chat;
+})
 
 function ai_join(){
     game_ID.innerHTML = game_ID_input.value

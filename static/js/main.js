@@ -1,7 +1,10 @@
 // Create Game state
 game = new chess();
 
-// Create Game board
+// Create Game board:
+// gb_ctx: board background
+// gp_ctx: chess pieces
+// gpu_ctx: move highlighting
 const game_board = document.getElementById('game_board');
 const gb_ctx =  game_board.getContext('2d');
 
@@ -11,6 +14,7 @@ const gp_ctx =  game_pieces.getContext('2d');
 const game_pieces_up = document.getElementById('game_pieces_up');
 const gpu_ctx =  game_pieces_up.getContext('2d');
 
+// set static canvas size
 game_board.width = 800;
 game_board.height = 800;
 
@@ -20,15 +24,19 @@ game_pieces.height = game_board.height;
 game_pieces_up.width = game_board.width;
 game_pieces_up.height = game_board.height;
 
+// compute the size of each square
 block_size = game_board.width/8;
 block_size = game_board.height/8;
 
+// track the picked up chess piece
 last_highlighted = [null,null]
 picked_up = [null,null]
 selected = [null,null]
 
 background_color1 = 'rgb(222, 128, 35)';
 background_color2 = 'rgb(255, 163, 71)';
+
+// initalize clientside gameboard
 for (var x = 0; x <= 8;x++){
     for(var i = 0;i <= 8; i++){
         if (i % 2 == x % 2){
@@ -46,9 +54,14 @@ for (var x = 0; x <= 8;x++){
     }
 }
 
+game.draw(gp_ctx)
+
+// server returns the moves that are valid which will be rendered on the client side
 socket.on('update_move_check', (data) =>{
     if (data.validmove.length != 0){
     game.clear()
+
+    // check for promotions and valid moves
     let canPromote = false
         for(var i = 0; i < data.validmove.length;i++){
             var move = game.uci_to_move(data.validmove[i])
@@ -78,6 +91,8 @@ socket.on('update_move_check', (data) =>{
             }
             game.board[move[1][0]][move[1][1]].highlight = true
         }
+
+        // update the UI to allow for promtion selection
         if (canPromote && !promotion_selection){
             if (!promotion_show){
                 var popup = document.getElementById("piece_selection_popup");
@@ -92,8 +107,9 @@ socket.on('update_move_check', (data) =>{
                 promotion_show = false
             }
         }
+
+        // rerender the canvas for move highlighting
         game.draw(gpu_ctx,false)
-        
     }
 })
 
@@ -104,6 +120,7 @@ function setPromotion(key){
     promotion_show = false
 }
 
+// server returns new state of the board via FEN string which is then decoded and rendered on the client side
 socket.on('update_board', (data) => {
     game.update(data.game_array)
     game.clear()
@@ -111,16 +128,12 @@ socket.on('update_board', (data) => {
     game.draw(gp_ctx)
 })
 
-socket.on('update_chat', (data) => {
-    global_message.value = data.chat;
-})
 
 socket.on('update_state', (data) => {
     global_message.value = data.chat;
     game.update(data.game_array)
 })
 
-game.draw(gp_ctx)
 
 // Compute where player click on screen
 document.addEventListener('mousemove', (event) => {
@@ -147,6 +160,7 @@ document.addEventListener('mousemove', (event) => {
     }
 });
 
+// check for clicks where mousedown picks up a piece and mouseup drops the piece
 document.addEventListener('mousedown', (event) => { 
     if (last_highlighted[0] == null || last_highlighted[1] == null || game.board[last_highlighted[0]][last_highlighted[1]].name === "blank"){
         return
@@ -177,6 +191,13 @@ document.addEventListener('mouseup', (event) => {
     game.draw(gpu_ctx,false)
 });
 
+function find_closest_block(x,y){
+    b1 = Math.floor(x / block_size)
+    b2 = Math.floor(y / block_size)
+    return [b1,b2]
+}
+
+// reset game (currently disable)
 const reset = document.getElementById('restart');
 
 reset.addEventListener("click", ()=>{
@@ -200,9 +221,3 @@ reset.addEventListener("click", ()=>{
     // }
     // xhr.send(formData)
 })
-
-function find_closest_block(x,y){
-    b1 = Math.floor(x / block_size)
-    b2 = Math.floor(y / block_size)
-    return [b1,b2]
-}

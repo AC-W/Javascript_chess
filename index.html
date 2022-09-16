@@ -13,6 +13,8 @@
 		<title>Chess</title>
 	</head>
 	<body onload="reload()">
+
+		<!-- Load assets -->
 		<div style="display:none;">
 			<img id="black_pawn"
 				 src="./static/resources/pieces_image/black_pawn.png"
@@ -67,6 +69,7 @@
 			<h1>Chess</h1>
 		</div>
 
+		<!-- account creation container -->
 		<div class="account_info_container">
 			<div class="popup" id="login">
 				<div class="popup_button" onclick="popup('login_account_popup')">
@@ -91,6 +94,7 @@
 			</div>
 		</div>
 
+		<!-- user info -->
 		<div class="user_info_container">
 			<p>Username:</p>
 			<p class="user_info_item" id ="username">Guest</p>
@@ -103,8 +107,10 @@
 				<button onclick="setPromotion('k')">Knight</button>
 			</div>
 		</div>
-		<div class="main_container">
 
+
+		<div class="main_container">
+			<!-- game settings -->
 			<div class="input_container">
 				<button class="input_items" id="restart">Restart</button>
 				<input class="input_items" type="text" id="game_ID_input" placeholder="Join ID"></input>
@@ -125,22 +131,32 @@
 				</div>
 			</div>
 
+			<!-- canvas -->
 			<div class="canvas_container">
+
+				<!-- game background canvas -->
 				<canvas id="game_board"></canvas>
+
+				<!-- canvas to render chess pieces -->
 				<canvas id="game_pieces"></canvas>
+
+				<!-- canvas to render valid moves -->
 				<canvas id="game_pieces_up"></canvas>
 			</div>
 
+			<!-- chat manu -->
 			<div class="chat_container">
-				<!-- &#10 for new line -->
-				<textarea disabled id="global_chat"> Empty Chat. Sadge :(</textarea>
+				<textarea disabled id="global_chat"> Empty Chat.</textarea>
 				<div class="text_input_area">
 					<textarea style="width:80%;" id="chat_entered"></textarea>
 					<button style="width: 20%;" onclick="send_message()">Send</button>
 				</div>
 			</div>
 
+		<!-- JS -->
 		</div>
+
+		<!-- connect to socket.io server -->
 		<script>
 			// create socket connection
 			// const socket = io("http://127.0.0.1:17995")
@@ -154,8 +170,14 @@
 			var promotion_show = false
 			var promotion_selection = null
 		</script>
+
+		<!-- client side chess -->
 		<script src="./static/js/chess.js"></script>
+
+		<!-- gameplay -->
 		<script src="./static/js/main.js"></script>
+
+		<!-- user setting -->
 		<script src="./static/js/user.js"></script>
 
 	</body>
